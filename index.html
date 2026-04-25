@@ -1,0 +1,965 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ventas y Cambalaches KC — Bienes Raíces</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="icon" type="image/png" href="img/favicon.png">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --navy: #0B1628;
+    --navy-mid: #152238;
+    --gold: #C8A96E;
+    --gold-light: #E2C99A;
+    --gold-pale: #F5EDD8;
+    --cream: #FAF7F2;
+    --cream-dark: #F0EBE0;
+    --text-dark: #0B1628;
+    --text-mid: #3D4B5C;
+    --text-muted: #7A8899;
+    --white: #FFFFFF;
+  }
+  html { scroll-behavior: smooth; }
+  body { font-family: 'Jost', sans-serif; background: var(--cream); color: var(--text-dark); font-weight: 300; overflow-x: hidden; }
+
+  /* NAV */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 1.1rem 5%;
+    background: rgba(11,22,40,0.94);
+    backdrop-filter: blur(14px);
+    border-bottom: 0.5px solid rgba(200,169,110,0.2);
+  }
+  .nav-logo { display: flex; flex-direction: column; line-height: 1; text-decoration: none; }
+  .nav-logo-top {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.1rem; font-weight: 500;
+    letter-spacing: 0.1em; color: var(--white);
+  }
+  .nav-logo-top em { font-style: normal; color: var(--gold); }
+  .nav-logo-kc {
+    font-family: 'Jost', sans-serif;
+    font-size: 0.6rem; font-weight: 500;
+    letter-spacing: 0.45em; text-transform: uppercase;
+    color: var(--gold); margin-top: 2px;
+  }
+  .nav-links { display: flex; gap: 2.5rem; list-style: none; }
+  .nav-links a {
+    font-size: 0.75rem; letter-spacing: 0.18em; text-transform: uppercase;
+    color: rgba(255,255,255,0.7); text-decoration: none; transition: color 0.3s;
+  }
+  .nav-links a:hover { color: var(--gold); }
+  .nav-cta {
+    font-size: 0.72rem; letter-spacing: 0.14em; text-transform: uppercase;
+    padding: 0.6rem 1.5rem; border: 1px solid var(--gold);
+    color: var(--gold); text-decoration: none; transition: all 0.3s;
+  }
+  .nav-cta:hover { background: var(--gold); color: var(--navy); }
+
+  /* HERO CAROUSEL */
+  .hero {
+    position: relative; height: 100vh; min-height: 700px;
+    overflow: hidden;
+  }
+
+  .carousel-track {
+    position: absolute; inset: 0;
+    display: flex; width: 400%; 
+    transition: transform 0.9s cubic-bezier(0.77,0,0.175,1);
+  }
+
+  .carousel-slide {
+    position: relative; width: 25%; flex-shrink: 0;
+    height: 100%;
+  }
+
+  .slide-bg {
+    position: absolute; inset: 0;
+    background-size: cover; background-position: center;
+    transform: scale(1.05);
+    transition: transform 8s ease-out;
+  }
+  .carousel-slide.active .slide-bg { transform: scale(1); }
+
+  .slide-overlay {
+    position: absolute; inset: 0;
+    background: linear-gradient(
+      135deg,
+      rgba(11,22,40,0.85) 0%,
+      rgba(11,22,40,0.35) 55%,
+      rgba(11,22,40,0.65) 100%
+    );
+  }
+
+  /* Animated diagonal accent */
+  .slide-accent {
+    position: absolute; top: 0; right: 0;
+    width: 38%; height: 100%;
+    border-left: 1px solid rgba(200,169,110,0.15);
+    background: linear-gradient(160deg, transparent 40%, rgba(200,169,110,0.05) 100%);
+    pointer-events: none;
+  }
+
+  .slide-content {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    padding: 0 5% 7%;
+    display: flex; justify-content: space-between; align-items: flex-end;
+  }
+
+  .slide-info { max-width: 560px; }
+
+  .slide-label {
+    font-size: 0.65rem; letter-spacing: 0.3em; text-transform: uppercase;
+    color: var(--gold); margin-bottom: 1rem;
+    display: flex; align-items: center; gap: 0.8rem;
+    opacity: 0; transform: translateY(20px);
+    transition: all 0.7s ease 0.3s;
+  }
+  .slide-label::before { content: ''; width: 32px; height: 1px; background: var(--gold); }
+
+  .slide-tag {
+    display: inline-block;
+    font-size: 0.6rem; letter-spacing: 0.2em; text-transform: uppercase;
+    padding: 0.35rem 1rem; background: var(--gold); color: var(--navy);
+    font-weight: 500; margin-bottom: 1rem;
+    opacity: 0; transform: translateY(20px);
+    transition: all 0.7s ease 0.4s;
+  }
+
+  .slide-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(2.4rem, 5vw, 4.5rem); font-weight: 300; line-height: 1.05;
+    color: var(--white); margin-bottom: 0.6rem;
+    opacity: 0; transform: translateY(24px);
+    transition: all 0.7s ease 0.5s;
+  }
+  .slide-name em { font-style: italic; color: var(--gold-light); }
+
+  .slide-location {
+    font-size: 0.82rem; letter-spacing: 0.1em;
+    color: rgba(255,255,255,0.5); margin-bottom: 1.2rem;
+    opacity: 0; transform: translateY(20px);
+    transition: all 0.7s ease 0.6s;
+  }
+
+  .slide-details {
+    display: flex; gap: 1.5rem; margin-bottom: 1.8rem;
+    opacity: 0; transform: translateY(20px);
+    transition: all 0.7s ease 0.65s;
+  }
+  .slide-detail {
+    font-size: 0.8rem; color: rgba(255,255,255,0.65);
+    display: flex; align-items: center; gap: 0.4rem;
+  }
+  .slide-detail::before { content: '◆'; font-size: 0.4rem; color: var(--gold); }
+
+  .slide-price {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 2rem; font-weight: 300; color: var(--gold);
+    opacity: 0; transform: translateY(20px);
+    transition: all 0.7s ease 0.7s;
+  }
+
+  .slide-actions {
+    display: flex; gap: 1rem; margin-top: 1.5rem;
+    opacity: 0; transform: translateY(20px);
+    transition: all 0.7s ease 0.8s;
+  }
+
+  .carousel-slide.active .slide-label,
+  .carousel-slide.active .slide-tag,
+  .carousel-slide.active .slide-name,
+  .carousel-slide.active .slide-location,
+  .carousel-slide.active .slide-details,
+  .carousel-slide.active .slide-price,
+  .carousel-slide.active .slide-actions {
+    opacity: 1; transform: translateY(0);
+  }
+
+  /* Property badge card (right side) */
+  .slide-badge {
+    flex-shrink: 0;
+    border: 1px solid rgba(200,169,110,0.35);
+    padding: 1.8rem 1.5rem; text-align: center;
+    width: 140px; background: rgba(11,22,40,0.5);
+    backdrop-filter: blur(8px);
+    opacity: 0; transform: translateX(20px);
+    transition: all 0.7s ease 0.9s;
+  }
+  .carousel-slide.active .slide-badge { opacity: 1; transform: translateX(0); }
+
+  .badge-num {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 3rem; font-weight: 300; color: var(--gold); line-height: 1;
+  }
+  .badge-label {
+    font-size: 0.6rem; letter-spacing: 0.18em; text-transform: uppercase;
+    color: rgba(255,255,255,0.5); margin-top: 0.4rem; line-height: 1.5;
+  }
+
+  /* Nav arrows */
+  .carousel-arrow {
+    position: absolute; top: 50%; transform: translateY(-50%);
+    z-index: 10; width: 52px; height: 52px;
+    border: 1px solid rgba(255,255,255,0.25);
+    background: rgba(11,22,40,0.4); backdrop-filter: blur(8px);
+    color: var(--white); cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.2rem; transition: all 0.3s;
+  }
+  .carousel-arrow:hover { border-color: var(--gold); color: var(--gold); background: rgba(11,22,40,0.7); }
+  .carousel-arrow.prev { left: 2%; }
+  .carousel-arrow.next { right: 2%; }
+
+  /* Dots */
+  .carousel-dots {
+    position: absolute; bottom: 2.5rem; left: 50%;
+    transform: translateX(-50%);
+    display: flex; gap: 0.7rem; z-index: 10;
+  }
+  .carousel-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: rgba(255,255,255,0.3);
+    cursor: pointer; transition: all 0.4s;
+    border: none; padding: 0;
+  }
+  .carousel-dot.active { background: var(--gold); width: 24px; border-radius: 3px; }
+
+  /* Slide counter */
+  .slide-counter {
+    position: absolute; top: 50%; right: 5%;
+    transform: translateY(-50%);
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 0.9rem; color: rgba(255,255,255,0.35);
+    letter-spacing: 0.15em; z-index: 10;
+    writing-mode: vertical-rl; text-orientation: mixed;
+  }
+  .slide-counter span { color: var(--gold); font-size: 1.4rem; }
+
+  /* Progress bar */
+  .carousel-progress {
+    position: absolute; bottom: 0; left: 0;
+    height: 2px; background: var(--gold);
+    width: 0%; z-index: 10;
+    transition: width 5s linear;
+  }
+  .carousel-progress.running { width: 100%; }
+
+  /* SEARCH BAR */
+  .search-bar {
+    background: var(--white); padding: 2rem 5%;
+    display: flex; align-items: center; gap: 0;
+    border-bottom: 1px solid var(--cream-dark);
+    box-shadow: 0 4px 30px rgba(11,22,40,0.06);
+  }
+  .search-field {
+    flex: 1; padding: 0.9rem 1.4rem;
+    border: none; border-right: 1px solid var(--cream-dark);
+    font-family: 'Jost', sans-serif; font-size: 0.88rem;
+    color: var(--text-dark); outline: none; background: transparent;
+  }
+  .search-field::placeholder { color: var(--text-muted); }
+  .search-select {
+    flex: 0.55; padding: 0.9rem 1.4rem;
+    border: none; border-right: 1px solid var(--cream-dark);
+    font-family: 'Jost', sans-serif; font-size: 0.85rem;
+    color: var(--text-muted); outline: none; background: transparent;
+    cursor: pointer; appearance: none;
+  }
+  .search-btn {
+    padding: 0.9rem 2.2rem; background: var(--navy);
+    color: var(--gold); font-family: 'Jost', sans-serif;
+    font-size: 0.72rem; letter-spacing: 0.18em; text-transform: uppercase;
+    border: none; cursor: pointer; transition: all 0.3s; font-weight: 500;
+  }
+  .search-btn:hover { background: var(--gold); color: var(--navy); }
+
+  /* STATS BAR */
+  .stats-bar {
+    background: var(--navy); padding: 2.8rem 5%;
+    display: grid; grid-template-columns: repeat(4, 1fr);
+  }
+  .stat-item { text-align: center; padding: 0 2rem; border-right: 0.5px solid rgba(255,255,255,0.07); }
+  .stat-item:last-child { border-right: none; }
+  .stat-num { font-family: 'Cormorant Garamond', serif; font-size: 2.8rem; font-weight: 300; color: var(--gold); line-height: 1; }
+  .stat-label { font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(255,255,255,0.4); margin-top: 0.4rem; }
+
+  /* SECTION COMMONS */
+  section { padding: 7rem 5%; }
+  .section-label {
+    font-size: 0.65rem; letter-spacing: 0.3em; text-transform: uppercase;
+    color: var(--gold); display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;
+  }
+  .section-label::before { content: ''; width: 28px; height: 1px; background: var(--gold); }
+  .section-title { font-family: 'Cormorant Garamond', serif; font-size: clamp(2rem, 3.5vw, 3.2rem); font-weight: 300; line-height: 1.15; color: var(--navy); }
+  .section-title em { font-style: italic; color: var(--gold); }
+
+  /* SERVICES */
+  .services { background: var(--white); }
+  .services-header { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: end; margin-bottom: 5rem; }
+  .services-intro { font-size: 0.92rem; line-height: 1.9; color: var(--text-mid); }
+  .services-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; }
+  .service-card {
+    padding: 3rem 2.5rem; border: 0.5px solid var(--cream-dark);
+    position: relative; transition: all 0.4s; cursor: default;
+  }
+  .service-card:hover { background: var(--navy); border-color: var(--navy); }
+  .service-card:hover .service-num { color: rgba(200,169,110,0.12); }
+  .service-card:hover .service-name { color: var(--white); }
+  .service-card:hover .service-desc { color: rgba(255,255,255,0.5); }
+  .service-num { font-family: 'Cormorant Garamond', serif; font-size: 4.5rem; font-weight: 300; color: rgba(11,22,40,0.05); line-height: 1; position: absolute; top: 1.5rem; right: 2rem; transition: color 0.4s; }
+  .service-icon { font-size: 1.5rem; color: var(--gold); margin-bottom: 1.5rem; }
+  .service-name { font-family: 'Cormorant Garamond', serif; font-size: 1.4rem; font-weight: 500; color: var(--navy); margin-bottom: 1rem; transition: color 0.4s; }
+  .service-desc { font-size: 0.86rem; line-height: 1.8; color: var(--text-muted); transition: color 0.4s; }
+
+  /* PROPERTIES */
+  .properties { background: var(--cream); }
+  .properties-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 4rem; }
+  .properties-grid { display: grid; grid-template-columns: 1.6fr 1fr; gap: 1.5px; }
+  .prop-main { grid-row: span 2; }
+  .prop-card { position: relative; overflow: hidden; cursor: pointer; background: var(--navy-mid); }
+  .prop-card-img { width: 100%; height: 100%; min-height: 300px; object-fit: cover; display: block; filter: brightness(0.7); transition: all 0.6s ease; }
+  .prop-main .prop-card-img { min-height: 620px; }
+  .prop-card:hover .prop-card-img { filter: brightness(0.5); transform: scale(1.04); }
+  .prop-info { position: absolute; bottom: 0; left: 0; right: 0; padding: 2rem; background: linear-gradient(to top, rgba(11,22,40,0.9) 0%, transparent 100%); transform: translateY(8px); transition: transform 0.4s; }
+  .prop-card:hover .prop-info { transform: translateY(0); }
+  .prop-tag { display: inline-block; font-size: 0.6rem; letter-spacing: 0.2em; text-transform: uppercase; padding: 0.3rem 0.8rem; background: var(--gold); color: var(--navy); margin-bottom: 0.8rem; font-weight: 500; }
+  .prop-name { font-family: 'Cormorant Garamond', serif; font-size: 1.5rem; font-weight: 400; color: var(--white); margin-bottom: 0.4rem; }
+  .prop-main .prop-name { font-size: 2.2rem; }
+  .prop-location { font-size: 0.76rem; color: rgba(255,255,255,0.5); letter-spacing: 0.1em; margin-bottom: 0.8rem; }
+  .prop-details { display: flex; gap: 1.5rem; font-size: 0.76rem; color: rgba(255,255,255,0.55); }
+  .prop-price { font-family: 'Cormorant Garamond', serif; font-size: 1.5rem; font-weight: 300; color: var(--gold); margin-top: 0.5rem; }
+
+  /* ABOUT */
+  .about { background: var(--navy); display: grid; grid-template-columns: 1fr 1fr; gap: 0; padding: 0; }
+  .about-image { position: relative; min-height: 600px; overflow: hidden; }
+  .about-image img { width: 100%; height: 100%; object-fit: cover; display: block; filter: brightness(0.65) sepia(0.15); }
+  .about-image-label { position: absolute; bottom: 3rem; right: -2rem; background: var(--gold); padding: 1.5rem 2rem; color: var(--navy); font-size: 0.65rem; letter-spacing: 0.15em; text-transform: uppercase; font-weight: 500; writing-mode: vertical-rl; }
+  .about-content { padding: 7rem 5% 7rem 6%; }
+  .about .section-label { color: var(--gold); }
+  .about .section-title { color: var(--white); }
+  .about .section-title em { color: var(--gold-light); }
+  .about-body { font-size: 0.92rem; line-height: 1.9; color: rgba(255,255,255,0.5); margin-top: 2rem; margin-bottom: 2.5rem; }
+  .about-features { list-style: none; display: flex; flex-direction: column; gap: 1rem; margin-bottom: 3rem; }
+  .about-features li { font-size: 0.84rem; color: rgba(255,255,255,0.65); display: flex; align-items: center; gap: 1rem; }
+  .about-features li::before { content: ''; width: 20px; height: 1px; background: var(--gold); flex-shrink: 0; }
+
+  /* PROCESS */
+  .process { background: var(--cream-dark); }
+  .process-steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 2rem; margin-top: 4rem; position: relative; }
+  .process-steps::before { content: ''; position: absolute; top: 2.4rem; left: 12.5%; right: 12.5%; height: 1px; background: linear-gradient(to right, transparent, var(--gold), transparent); }
+  .process-step { text-align: center; padding: 1rem; }
+  .step-num { width: 48px; height: 48px; border-radius: 50%; border: 1px solid var(--gold); display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; font-family: 'Cormorant Garamond', serif; font-size: 1.2rem; color: var(--gold); background: var(--cream-dark); position: relative; z-index: 1; }
+  .step-title { font-family: 'Cormorant Garamond', serif; font-size: 1.1rem; font-weight: 500; color: var(--navy); margin-bottom: 0.7rem; }
+  .step-desc { font-size: 0.82rem; line-height: 1.75; color: var(--text-muted); }
+
+  /* TESTIMONIALS */
+  .testimonials { background: var(--white); }
+  .testimonials-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem; margin-top: 4rem; }
+  .testimonial-card { padding: 2.5rem; border: 0.5px solid var(--cream-dark); position: relative; }
+  .testimonial-card::before { content: '"'; font-family: 'Cormorant Garamond', serif; font-size: 5rem; font-weight: 300; color: var(--gold-pale); position: absolute; top: 0.5rem; left: 1.5rem; line-height: 1; }
+  .testimonial-text { font-size: 0.88rem; line-height: 1.9; color: var(--text-mid); margin-bottom: 2rem; padding-top: 1.5rem; }
+  .testimonial-author { display: flex; align-items: center; gap: 1rem; }
+  .author-avatar { width: 42px; height: 42px; border-radius: 50%; background: var(--navy); display: flex; align-items: center; justify-content: center; font-family: 'Cormorant Garamond', serif; font-size: 1rem; color: var(--gold); }
+  .author-name { font-size: 0.84rem; font-weight: 500; color: var(--navy); }
+  .author-role { font-size: 0.7rem; letter-spacing: 0.1em; color: var(--text-muted); margin-top: 0.15rem; }
+
+  /* CTA */
+  .cta-section { background: var(--navy); padding: 8rem 5%; text-align: center; position: relative; overflow: hidden; }
+  .cta-section::before { content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 600px; height: 600px; border-radius: 50%; border: 0.5px solid rgba(200,169,110,0.07); }
+  .cta-section::after { content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 900px; height: 900px; border-radius: 50%; border: 0.5px solid rgba(200,169,110,0.04); }
+  .cta-label { color: var(--gold); justify-content: center; }
+  .cta-label::before { display: none; }
+  .cta-title { font-family: 'Cormorant Garamond', serif; font-size: clamp(2.2rem, 4vw, 4rem); font-weight: 300; color: var(--white); margin-bottom: 1.5rem; position: relative; z-index: 1; }
+  .cta-title em { font-style: italic; color: var(--gold-light); }
+  .cta-desc { font-size: 0.92rem; color: rgba(255,255,255,0.45); max-width: 460px; margin: 0 auto 3rem; line-height: 1.8; position: relative; z-index: 1; }
+  .cta-actions { display: flex; justify-content: center; gap: 1.2rem; position: relative; z-index: 1; }
+
+  /* BTNs */
+  .btn-primary { font-size: 0.72rem; letter-spacing: 0.18em; text-transform: uppercase; padding: 0.95rem 2.2rem; background: var(--gold); color: var(--navy); text-decoration: none; font-weight: 500; transition: all 0.3s; }
+  .btn-primary:hover { background: var(--gold-light); }
+  .btn-ghost { font-size: 0.72rem; letter-spacing: 0.18em; text-transform: uppercase; padding: 0.95rem 2.2rem; border: 1px solid rgba(255,255,255,0.3); color: rgba(255,255,255,0.7); text-decoration: none; transition: all 0.3s; }
+  .btn-ghost:hover { border-color: var(--gold); color: var(--gold); }
+
+  /* CONTACT STRIP */
+  .contact-strip { background: var(--gold); padding: 2.2rem 5%; display: flex; justify-content: space-between; align-items: center; }
+  .contact-strip-text { font-size: 0.72rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--navy); font-weight: 500; }
+  .contact-strip-info { display: flex; gap: 3rem; }
+  .contact-item { font-size: 0.8rem; color: var(--navy-mid); }
+  .contact-item-label { font-size: 0.58rem; letter-spacing: 0.15em; text-transform: uppercase; color: rgba(11,22,40,0.45); display: block; margin-bottom: 0.1rem; }
+
+  /* FOOTER */
+  footer { background: #070E1A; padding: 5rem 5% 3rem; }
+  .footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 4rem; padding-bottom: 3rem; border-bottom: 0.5px solid rgba(255,255,255,0.05); margin-bottom: 2.5rem; }
+  .footer-tagline { font-size: 0.8rem; line-height: 1.8; color: rgba(255,255,255,0.3); max-width: 240px; margin: 1.2rem 0 2rem; }
+  .footer-social { display: flex; gap: 0.8rem; }
+  .social-btn { width: 36px; height: 36px; border: 0.5px solid rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center; color: rgba(255,255,255,0.35); text-decoration: none; font-size: 0.7rem; font-weight: 500; transition: all 0.3s; }
+  .social-btn:hover { border-color: var(--gold); color: var(--gold); }
+  .footer-col h4 { font-size: 0.65rem; letter-spacing: 0.25em; text-transform: uppercase; color: rgba(255,255,255,0.55); margin-bottom: 1.5rem; }
+  .footer-links { list-style: none; display: flex; flex-direction: column; gap: 0.75rem; }
+  .footer-links a { font-size: 0.8rem; color: rgba(255,255,255,0.3); text-decoration: none; transition: color 0.3s; }
+  .footer-links a:hover { color: var(--gold); }
+  .footer-bottom { display: flex; justify-content: space-between; font-size: 0.7rem; color: rgba(255,255,255,0.18); }
+  .footer-bottom .gold { color: var(--gold); opacity: 0.55; }
+
+  /* ── HAMBURGER ── */
+  .nav-hamburger {
+    display: none; flex-direction: column; gap: 5px;
+    cursor: pointer; padding: 4px; background: none; border: none;
+    z-index: 300;
+  }
+  .nav-hamburger span {
+    display: block; width: 24px; height: 1.5px;
+    background: var(--white); transition: all 0.35s;
+  }
+  .nav-hamburger.open span:nth-child(1) { transform: translateY(6.5px) rotate(45deg); }
+  .nav-hamburger.open span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+  .nav-hamburger.open span:nth-child(3) { transform: translateY(-6.5px) rotate(-45deg); }
+
+  /* ── MOBILE MENU OVERLAY ── */
+  .mobile-menu {
+    display: none; position: fixed; inset: 0; z-index: 250;
+    background: rgba(11,22,40,0.98);
+    flex-direction: column; align-items: center; justify-content: center;
+    gap: 0;
+    opacity: 0; transition: opacity 0.35s;
+  }
+  .mobile-menu.open { opacity: 1; }
+  .mobile-menu a {
+    font-size: 1.6rem; font-family: 'Cormorant Garamond', serif;
+    font-weight: 300; color: rgba(255,255,255,0.7);
+    text-decoration: none; padding: 1rem 2rem;
+    letter-spacing: 0.08em; transition: color 0.3s;
+    border-bottom: 0.5px solid rgba(255,255,255,0.06); width: 100%; text-align: center;
+  }
+  .mobile-menu a:hover { color: var(--gold); }
+  .mobile-menu .mobile-cta {
+    margin-top: 2rem; font-size: 0.8rem; letter-spacing: 0.18em;
+    text-transform: uppercase; font-family: 'Jost', sans-serif;
+    padding: 1rem 3rem; border: 1px solid var(--gold);
+    color: var(--gold); font-weight: 500;
+  }
+
+  /* ════════════════════════════════════════
+     TABLET  ≤ 1024px
+  ════════════════════════════════════════ */
+  @media (max-width: 1024px) {
+    .nav-links { gap: 1.5rem; }
+    .nav-links a { font-size: 0.7rem; }
+
+    .slide-badge { display: none; }
+    .slide-counter { display: none; }
+    .slide-content { padding: 0 5% 6%; }
+
+    .stats-bar { grid-template-columns: repeat(2, 1fr); gap: 0; }
+    .stat-item { border-right: none; border-bottom: 0.5px solid rgba(255,255,255,0.07); padding: 2rem; }
+    .stat-item:nth-child(1), .stat-item:nth-child(2) { border-right: 0.5px solid rgba(255,255,255,0.07); }
+    .stat-item:nth-child(3), .stat-item:nth-child(4) { border-bottom: none; }
+
+    .services-header { grid-template-columns: 1fr; gap: 1.5rem; }
+    .services-grid { grid-template-columns: repeat(2, 1fr); }
+
+    .properties-grid { grid-template-columns: 1fr; }
+    .prop-main { grid-row: span 1; }
+    .prop-main .prop-card-img { min-height: 420px; }
+    .prop-main .prop-name { font-size: 1.8rem; }
+
+    .about { grid-template-columns: 1fr; }
+    .about-image { min-height: 360px; }
+    .about-image-label { display: none; }
+    .about-content { padding: 4rem 5%; }
+
+    .process-steps { grid-template-columns: repeat(2, 1fr); }
+    .process-steps::before { display: none; }
+
+    .testimonials-grid { grid-template-columns: repeat(2, 1fr); }
+
+    .footer-grid { grid-template-columns: 1fr 1fr; gap: 2.5rem; }
+  }
+
+  /* ════════════════════════════════════════
+     MOBILE  ≤ 768px
+  ════════════════════════════════════════ */
+  @media (max-width: 768px) {
+    /* Nav */
+    .nav-links { display: none; }
+    .nav-cta { display: none; }
+    .nav-hamburger { display: flex; }
+    nav { padding: 1rem 5%; }
+
+    /* Hero */
+    .hero { min-height: 100svh; }
+    .slide-content { padding: 0 5% 8%; flex-direction: column; align-items: flex-start; }
+    .slide-info { max-width: 100%; }
+    .slide-name { font-size: clamp(1.9rem, 8vw, 3rem); }
+    .slide-label { margin-bottom: 0.6rem; }
+    .slide-details { flex-wrap: wrap; gap: 0.8rem; margin-bottom: 1.2rem; }
+    .slide-price { font-size: 1.5rem; }
+    .slide-actions { flex-direction: column; gap: 0.75rem; }
+    .slide-actions a { text-align: center; }
+    .carousel-arrow { width: 40px; height: 40px; font-size: 1rem; }
+    .carousel-arrow.prev { left: 1%; }
+    .carousel-arrow.next { right: 1%; }
+    .carousel-dots { bottom: 1.5rem; }
+
+    /* Search bar */
+    .search-bar { flex-direction: column; align-items: stretch; padding: 1rem 5%; gap: 0; }
+    .search-field { border-right: none; border-bottom: 1px solid var(--cream-dark); }
+    .search-select { border-right: none; border-bottom: 1px solid var(--cream-dark); padding: 0.85rem 1rem; }
+    .search-btn { padding: 1rem; font-size: 0.8rem; }
+
+    /* Stats */
+    .stats-bar { grid-template-columns: repeat(2, 1fr); padding: 1.5rem 4%; }
+    .stat-item { padding: 1.2rem 1rem; }
+    .stat-num { font-size: 2rem; }
+
+    /* Sections */
+    section { padding: 4rem 5%; }
+
+    /* Services */
+    .services-header { grid-template-columns: 1fr; gap: 1rem; margin-bottom: 2.5rem; }
+    .services-grid { grid-template-columns: 1fr; }
+    .service-card { padding: 2rem 1.5rem; }
+
+    /* Properties */
+    .properties-header { flex-direction: column; align-items: flex-start; gap: 1.5rem; margin-bottom: 2rem; }
+    .properties-grid { grid-template-columns: 1fr; gap: 2px; }
+    .prop-card-img { min-height: 260px; }
+    .prop-main .prop-card-img { min-height: 300px; }
+    .prop-main .prop-name { font-size: 1.5rem; }
+    .prop-info { padding: 1.2rem; }
+    .prop-details { flex-wrap: wrap; gap: 0.6rem; }
+
+    /* About */
+    .about { display: flex; flex-direction: column; }
+    .about-image { min-height: 280px; order: 1; }
+    .about-content { padding: 3rem 5%; order: 2; }
+
+    /* Process */
+    .process-steps { grid-template-columns: repeat(2, 1fr); gap: 1.5rem; margin-top: 2.5rem; }
+
+    /* Testimonials */
+    .testimonials-grid { grid-template-columns: 1fr; gap: 1.5rem; margin-top: 2.5rem; }
+
+    /* CTA */
+    .cta-section { padding: 5rem 5%; }
+    .cta-actions { flex-direction: column; align-items: center; gap: 1rem; }
+    .cta-actions a { width: 100%; max-width: 280px; text-align: center; }
+
+    /* Contact strip */
+    .contact-strip { flex-direction: column; gap: 1.2rem; padding: 2rem 5%; text-align: center; }
+    .contact-strip-info { flex-direction: column; gap: 0.8rem; align-items: center; }
+
+    /* Footer */
+    .footer-grid { grid-template-columns: 1fr; gap: 2rem; }
+    .footer-bottom { flex-direction: column; gap: 0.5rem; text-align: center; }
+  }
+
+  /* ════════════════════════════════════════
+     SMALL MOBILE  ≤ 480px
+  ════════════════════════════════════════ */
+  @media (max-width: 480px) {
+    .slide-name { font-size: clamp(1.6rem, 7vw, 2.2rem); }
+    .slide-detail { font-size: 0.72rem; }
+    .process-steps { grid-template-columns: 1fr; }
+    .stat-item { padding: 1rem 0.5rem; }
+    .stat-num { font-size: 1.8rem; }
+    .stat-label { font-size: 0.58rem; }
+    .btn-primary, .btn-ghost { padding: 0.85rem 1.5rem; font-size: 0.68rem; }
+    section { padding: 3.5rem 5%; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="nav-logo">
+    <span class="nav-logo-top">Ventas y <em>Cambalaches</em></span>
+    <span class="nav-logo-kc">KC · INMOBILIARIA</span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="#propiedades">Propiedades</a></li>
+    <li><a href="#servicios">Servicios</a></li>
+    <li><a href="#nosotros">Nosotros</a></li>
+    <li><a href="#proceso">Proceso</a></li>
+    <li><a href="#contacto">Contacto</a></li>
+  </ul>
+  <a href="#contacto" class="nav-cta">Agenda una cita</a>
+  <button class="nav-hamburger" id="hamburger" aria-label="Menú">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+<div class="mobile-menu" id="mobileMenu">
+  <a href="#propiedades" class="mobile-link">Propiedades</a>
+  <a href="#servicios" class="mobile-link">Servicios</a>
+  <a href="#nosotros" class="mobile-link">Nosotros</a>
+  <a href="#proceso" class="mobile-link">Proceso</a>
+  <a href="#contacto" class="mobile-link">Contacto</a>
+  <a href="#contacto" class="mobile-cta">Agenda una cita</a>
+</div>
+
+<!-- HERO CAROUSEL -->
+<div class="hero">
+
+  <div class="carousel-track" id="track">
+
+    <!-- Slide 1 -->
+    <div class="carousel-slide active">
+      <div class="slide-bg" style="background-image:url('https://images.unsplash.com/photo-1613490493576-7fde63acd811?w=1800&q=90')"></div>
+      <div class="slide-overlay"></div>
+      <div class="slide-accent"></div>
+      <div class="slide-content">
+        <div class="slide-info">
+          <div class="slide-label">Propiedad Destacada</div>
+          <span class="slide-tag">En Venta</span>
+          <h1 class="slide-name">Casa <em>El Poblado</em></h1>
+          <div class="slide-location">El Poblado · Medellín, Antioquia</div>
+          <div class="slide-details">
+            <span class="slide-detail">5 habitaciones</span>
+            <span class="slide-detail">4 baños</span>
+            <span class="slide-detail">380 m²</span>
+            <span class="slide-detail">Piscina privada</span>
+          </div>
+          <div class="slide-price">$ 1.850.000.000</div>
+          <div class="slide-actions">
+            <a href="#" class="btn-primary">Ver detalles</a>
+            <a href="https://wa.me/573001234567" class="btn-ghost">Consultar</a>
+          </div>
+        </div>
+        <div class="slide-badge">
+          <div class="badge-num">340+</div>
+          <div class="badge-label">Propiedades<br>gestionadas</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 2 -->
+    <div class="carousel-slide">
+      <div class="slide-bg" style="background-image:url('https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=1800&q=90')"></div>
+      <div class="slide-overlay"></div>
+      <div class="slide-accent"></div>
+      <div class="slide-content">
+        <div class="slide-info">
+          <div class="slide-label">Exclusividad Premium</div>
+          <span class="slide-tag">En Venta</span>
+          <h1 class="slide-name">Villa <em>Campestre</em></h1>
+          <div class="slide-location">Cajicá · Cundinamarca</div>
+          <div class="slide-details">
+            <span class="slide-detail">6 habitaciones</span>
+            <span class="slide-detail">5 baños</span>
+            <span class="slide-detail">520 m²</span>
+            <span class="slide-detail">Jardín 2.000 m²</span>
+          </div>
+          <div class="slide-price">$ 2.200.000.000</div>
+          <div class="slide-actions">
+            <a href="#" class="btn-primary">Ver detalles</a>
+            <a href="https://wa.me/573001234567" class="btn-ghost">Consultar</a>
+          </div>
+        </div>
+        <div class="slide-badge">
+          <div class="badge-num">98%</div>
+          <div class="badge-label">Clientes<br>satisfechos</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 3 -->
+    <div class="carousel-slide">
+      <div class="slide-bg" style="background-image:url('https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=1800&q=85')"></div>
+      <div class="slide-overlay"></div>
+      <div class="slide-accent"></div>
+      <div class="slide-content">
+        <div class="slide-info">
+          <div class="slide-label">Vida en altura</div>
+          <span class="slide-tag">En Venta</span>
+          <h1 class="slide-name">Penthouse <em>Chicó</em></h1>
+          <div class="slide-location">Chicó Norte · Bogotá, D.C.</div>
+          <div class="slide-details">
+            <span class="slide-detail">3 habitaciones</span>
+            <span class="slide-detail">2 baños</span>
+            <span class="slide-detail">145 m²</span>
+            <span class="slide-detail">Vista panorámica</span>
+          </div>
+          <div class="slide-price">$ 8.500.000 <small style="font-size:1rem;opacity:.7">/ mes</small></div>
+          <div class="slide-actions">
+            <a href="#" class="btn-primary">Ver detalles</a>
+            <a href="https://wa.me/573001234567" class="btn-ghost">Consultar</a>
+          </div>
+        </div>
+        <div class="slide-badge">
+          <div class="badge-num">12</div>
+          <div class="badge-label">Ciudades en<br>Colombia</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 4 -->
+    <div class="carousel-slide">
+      <div class="slide-bg" style="background-image:url('https://images.unsplash.com/photo-1583608205776-bfd35f0d9f83?w=1800&q=85')"></div>
+      <div class="slide-overlay"></div>
+      <div class="slide-accent"></div>
+      <div class="slide-content">
+        <div class="slide-info">
+          <div class="slide-label">Oportunidad de Inversión</div>
+          <span class="slide-tag">En Venta</span>
+          <h1 class="slide-name">Casa <em>Laureles</em></h1>
+          <div class="slide-location">Laureles · Medellín, Antioquia</div>
+          <div class="slide-details">
+            <span class="slide-detail">4 habitaciones</span>
+            <span class="slide-detail">3 baños</span>
+            <span class="slide-detail">220 m²</span>
+            <span class="slide-detail">Terraza BBQ</span>
+          </div>
+          <div class="slide-price">$ 980.000.000</div>
+          <div class="slide-actions">
+            <a href="#" class="btn-primary">Ver detalles</a>
+            <a href="https://wa.me/573001234567" class="btn-ghost">Consultar</a>
+          </div>
+        </div>
+        <div class="slide-badge">
+          <div class="badge-num">15+</div>
+          <div class="badge-label">Años de<br>experiencia</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Arrows -->
+  <button class="carousel-arrow prev" id="prevBtn">&#8592;</button>
+  <button class="carousel-arrow next" id="nextBtn">&#8594;</button>
+
+  <!-- Dots -->
+  <div class="carousel-dots" id="dots">
+    <button class="carousel-dot active" data-idx="0"></button>
+    <button class="carousel-dot" data-idx="1"></button>
+    <button class="carousel-dot" data-idx="2"></button>
+    <button class="carousel-dot" data-idx="3"></button>
+  </div>
+
+  <!-- Counter -->
+  <div class="slide-counter" id="counter"><span>01</span> / 04</div>
+
+  <!-- Progress bar -->
+  <div class="carousel-progress" id="progress"></div>
+
+</div>
+
+<!-- SEARCH BAR -->
+<div class="search-bar">
+  <input class="search-field" type="text" placeholder="Ciudad, barrio o referencia...">
+  <select class="search-select"><option>Tipo de inmueble</option><option>Casa</option><option>Apartamento</option><option>Local</option><option>Oficina</option><option>Lote</option></select>
+  <select class="search-select"><option>Operación</option><option>En Venta</option><option>Cambalache</option></select>
+  <select class="search-select"><option>Precio</option><option>Hasta $200M</option><option>$200M–$500M</option><option>$500M–$1.000M</option><option>Más de $1.000M</option></select>
+  <button class="search-btn">Buscar</button>
+</div>
+
+<!-- STATS -->
+<div class="stats-bar">
+  <div class="stat-item"><div class="stat-num">340+</div><div class="stat-label">Propiedades vendidas</div></div>
+  <div class="stat-item"><div class="stat-num">98%</div><div class="stat-label">Clientes satisfechos</div></div>
+  <div class="stat-item"><div class="stat-num">12</div><div class="stat-label">Ciudades en Colombia</div></div>
+  <div class="stat-item"><div class="stat-num">$2.4B</div><div class="stat-label">En transacciones 2024</div></div>
+</div>
+
+<!-- SERVICES -->
+<section class="services" id="servicios">
+  <div class="services-header">
+    <div>
+      <div class="section-label">Lo que hacemos</div>
+      <h2 class="section-title">Servicios pensados<br>para <em>cada cliente</em></h2>
+    </div>
+    <p class="services-intro">En Ventas y Cambalaches KC acompañamos cada transacción con experiencia, honestidad y dedicación. Desde la consulta inicial hasta la entrega de llaves.</p>
+  </div>
+  <div class="services-grid">
+    <div class="service-card"><div class="service-num">01</div><div class="service-icon">⌂</div><div class="service-name">Venta de Inmuebles</div><p class="service-desc">Valuamos, posicionamos y vendemos tu propiedad al mejor precio del mercado con estrategia profesional y difusión multicanal.</p></div>
+    <div class="service-card"><div class="service-num">02</div><div class="service-icon">◉</div><div class="service-name">Cambalaches (Permutas)</div><p class="service-desc">Especialistas en intercambio de propiedades. Facilitamos permutas y negociaciones directas entre propietarios con total seguridad jurídica.</p></div>
+    <div class="service-card"><div class="service-num">03</div><div class="service-icon">◐</div><div class="service-name">Asesoría de Compra</div><p class="service-desc">Te guiamos en la búsqueda, negociación y cierre de la propiedad que se ajusta a tu presupuesto y estilo de vida.</p></div>
+    <div class="service-card"><div class="service-num">04</div><div class="service-icon">◫</div><div class="service-name">Avalúos Profesionales</div><p class="service-desc">Avalúos técnicos certificados que te dan seguridad jurídica y financiera en cualquier transacción inmobiliaria.</p></div>
+    <div class="service-card"><div class="service-num">05</div><div class="service-icon">◳</div><div class="service-name">Trámites y Asesoría Legal</div><p class="service-desc">Escrituración, cambio de titularidad, promesas de compraventa y todo el proceso notarial con expertos de confianza.</p></div>
+  </div>
+</section>
+
+<!-- PROPERTIES -->
+<section class="properties" id="propiedades">
+  <div class="properties-header">
+    <div><div class="section-label">Portafolio</div><h2 class="section-title">Propiedades <em>destacadas</em></h2></div>
+    <a href="#" class="btn-primary" style="white-space:nowrap;">Ver todas</a>
+  </div>
+  <div class="properties-grid">
+    <div class="prop-main prop-card">
+      <img class="prop-card-img" src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=900&q=85" alt="">
+      <div class="prop-info"><span class="prop-tag">En venta</span><div class="prop-name">Casa El Poblado</div><div class="prop-location">El Poblado · Medellín, Antioquia</div><div class="prop-details"><span>5 hab.</span><span>4 baños</span><span>380 m²</span><span>Piscina</span></div><div class="prop-price">$ 1.850.000.000</div></div>
+    </div>
+    <div class="prop-card">
+      <img class="prop-card-img" src="https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=700&q=80" alt="">
+      <div class="prop-info"><span class="prop-tag">En Venta</span><div class="prop-name">Penthouse Chicó</div><div class="prop-location">Chicó Norte · Bogotá, D.C.</div><div class="prop-details"><span>3 hab.</span><span>2 baños</span><span>145 m²</span></div><div class="prop-price">$ 8.500.000 / mes</div></div>
+    </div>
+    <div class="prop-card">
+      <img class="prop-card-img" src="https://images.unsplash.com/photo-1583608205776-bfd35f0d9f83?w=700&q=80" alt="">
+      <div class="prop-info"><span class="prop-tag">En venta</span><div class="prop-name">Casa Laureles</div><div class="prop-location">Laureles · Medellín, Antioquia</div><div class="prop-details"><span>4 hab.</span><span>3 baños</span><span>220 m²</span></div><div class="prop-price">$ 980.000.000</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section class="about" id="nosotros">
+  <div class="about-image">
+    <img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?w=800&q=85" alt="">
+    <div class="about-image-label">Nuestro Equipo</div>
+  </div>
+  <div class="about-content">
+    <div class="section-label">¿Quiénes somos?</div>
+    <h2 class="section-title" style="color:white;">Más que una agencia,<br>somos <em>tu aliado</em><br>de confianza</h2>
+    <p class="about-body">Ventas y Cambalaches KC nació con la convicción de que toda transacción inmobiliaria debe ser justa, transparente y beneficiosa para todas las partes. Somos especialistas tanto en compraventas tradicionales como en permutas y cambalaches — una opción inteligente que pocos dominan en el mercado colombiano.</p>
+    <ul class="about-features">
+      <li>Equipo con más de 15 años en el sector inmobiliario colombiano</li>
+      <li>Expertos en permutas y cambalaches entre propietarios</li>
+      <li>Cobertura en las principales ciudades del país</li>
+      <li>Procesos 100% transparentes, documentados y seguros</li>
+      <li>Atención personalizada de inicio a cierre</li>
+    </ul>
+    <a href="#contacto" class="btn-primary">Habla con nosotros</a>
+  </div>
+</section>
+
+<!-- PROCESS -->
+<section class="process" id="proceso">
+  <div class="section-label">Cómo trabajamos</div>
+  <h2 class="section-title">Tu camino hacia<br>la <em>propiedad ideal</em></h2>
+  <div class="process-steps">
+    <div class="process-step"><div class="step-num">1</div><div class="step-title">Consulta Inicial</div><p class="step-desc">Escuchamos tus necesidades, presupuesto y expectativas para entender exactamente lo que buscas o necesitas cambiar.</p></div>
+    <div class="process-step"><div class="step-num">2</div><div class="step-title">Selección a medida</div><p class="step-desc">Filtramos el portafolio y el mercado para presentarte solo opciones reales que se ajusten a tu situación específica.</p></div>
+    <div class="process-step"><div class="step-num">3</div><div class="step-title">Visitas y negociación</div><p class="step-desc">Coordinamos visitas, evaluamos opciones y negociamos las mejores condiciones en tu nombre con total transparencia.</p></div>
+    <div class="process-step"><div class="step-num">4</div><div class="step-title">Cierre y entrega</div><p class="step-desc">Gestionamos toda la documentación legal y te acompañamos hasta que las llaves estén en tus manos.</p></div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<!--section class="testimonials">
+  <div class="section-label">Testimonios</div>
+  <h2 class="section-title">Lo que dicen<br>nuestros <em>clientes</em></h2>
+  <div class="testimonials-grid">
+    <div class="testimonial-card"><p class="testimonial-text">Encontré mi apartamento perfecto en tiempo récord. El proceso fue transparente y sin ninguna sorpresa desagradable. Los recomiendo ampliamente.</p><div class="testimonial-author"><div class="author-avatar">CM</div><div><div class="author-name">Camila Martínez</div><div class="author-role">Compradora · Bogotá</div></div></div></div>
+    <div class="testimonial-card"><p class="testimonial-text">Hice un cambalache con KC y fue la mejor decisión. Me consiguieron una propiedad de mayor valor a cambio de la mía. Increíble gestión.</p><div class="testimonial-author"><div class="author-avatar">JR</div><div><div class="author-name">Juan Restrepo</div><div class="author-role">Permuta · Medellín</div></div></div></div>
+    <div class="testimonial-card"><p class="testimonial-text">Vendí mi propiedad 12% por encima del precio esperado. La estrategia de marketing que usaron fue clave. Profesionalismo de primer nivel.</p><div class="testimonial-author"><div class="author-avatar">AP</div><div><div class="author-name">Adriana Pinto</div><div class="author-role">Vendedora · Cali</div></div></div></div>
+  </div>
+</section>-->
+
+<!-- CTA -->
+<section class="cta-section" id="contacto">
+  <div class="section-label cta-label">¿Listo para comenzar?</div>
+  <h2 class="cta-title">Tu próxima propiedad<br>te está <em>esperando</em></h2>
+  <p class="cta-desc">Agenda una consulta gratuita. Ya sea venta o cambalache — tenemos la solución para ti.</p>
+  <div class="cta-actions">
+    <a href="https://wa.me/573001234567" class="btn-primary">WhatsApp</a>
+  </div>
+</section>
+
+<!-- CONTACT STRIP -->
+<div class="contact-strip">
+  <div class="contact-strip-text">Estamos disponibles para ti</div>
+  <div class="contact-strip-info">
+    <div class="contact-item"><span class="contact-item-label">Teléfono</span>+57 300 123 4567</div>
+    <div class="contact-item"><span class="contact-item-label">Correo</span>ventasycambalacheskc@gmail.com</div>
+    <div class="contact-item"><span class="contact-item-label">Horario</span>Lun – Sáb · 8am – 7pm</div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-grid">
+    <div>
+      <a href="#" class="nav-logo" style="display:inline-block; margin-bottom:1rem;">
+        <span class="nav-logo-top">Ventas y <em>Cambalaches</em></span>
+        <span class="nav-logo-kc">KC · Bienes Raíces</span>
+      </a>
+      <p class="footer-tagline">Compramos, vendemos, arrendamos y hacemos cambalaches con honestidad y dedicación para cada cliente en Colombia.</p>
+      <div class="footer-social">
+        <a href="#" class="social-btn">ig</a>
+        <a href="#" class="social-btn">fb</a>
+        <a href="#" class="social-btn">tk</a>
+        <a href="#" class="social-btn">wa</a>
+      </div>
+    </div>
+    <div class="footer-col"><h4>Propiedades</h4><ul class="footer-links"><li><a href="#">Venta</a></li><li><a href="#">Cambalaches</a></li><li><a href="#">Inversión</a></li><li><a href="#">Comerciales</a></li></ul></div>
+    <div class="footer-col"><h4>Servicios</h4><ul class="footer-links"><li><a href="#">Asesoría de compra</a></li><li><a href="#">Venta de inmuebles</a></li><li><a href="#">Avalúos</a></li><li><a href="#">Trámites legales</a></li></ul></div>
+    <div class="footer-col"><h4>Compañía</h4><ul class="footer-links"><li><a href="#">Quiénes somos</a></li><li><a href="#">Contacto</a></li></ul></div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2026 Jhonnier Zambrano · Todos los derechos reservados</span>
+    <span class="gold">Bienes Raíces · Colombia</span>
+  </div>
+</footer>
+
+<script>
+const slides = document.querySelectorAll('.carousel-slide');
+const dots = document.querySelectorAll('.carousel-dot');
+const track = document.getElementById('track');
+const counter = document.getElementById('counter');
+const progress = document.getElementById('progress');
+let current = 0, timer, progTimer;
+
+function goTo(idx) {
+  slides[current].classList.remove('active');
+  dots[current].classList.remove('active');
+  current = (idx + slides.length) % slides.length;
+  slides[current].classList.add('active');
+  dots[current].classList.add('active');
+  track.style.transform = `translateX(-${current * 25}%)`;
+  counter.innerHTML = `<span>${String(current + 1).padStart(2,'0')}</span> / 0${slides.length}`;
+  restartProgress();
+}
+
+function restartProgress() {
+  progress.style.transition = 'none';
+  progress.style.width = '0%';
+  clearTimeout(progTimer);
+  progTimer = setTimeout(() => {
+    progress.style.transition = 'width 5s linear';
+    progress.style.width = '100%';
+  }, 50);
+}
+
+function startAuto() {
+  clearInterval(timer);
+  timer = setInterval(() => goTo(current + 1), 5000);
+}
+
+document.getElementById('nextBtn').addEventListener('click', () => { goTo(current + 1); startAuto(); });
+document.getElementById('prevBtn').addEventListener('click', () => { goTo(current - 1); startAuto(); });
+dots.forEach(d => d.addEventListener('click', () => { goTo(+d.dataset.idx); startAuto(); }));
+
+goTo(0);
+startAuto();
+
+// Hamburger menu
+const hamburger = document.getElementById('hamburger');
+const mobileMenu = document.getElementById('mobileMenu');
+hamburger.addEventListener('click', () => {
+  const isOpen = mobileMenu.style.display === 'flex';
+  if (isOpen) {
+    mobileMenu.style.opacity = '0';
+    hamburger.classList.remove('open');
+    setTimeout(() => { mobileMenu.style.display = 'none'; }, 350);
+  } else {
+    mobileMenu.style.display = 'flex';
+    requestAnimationFrame(() => { mobileMenu.style.opacity = '1'; });
+    hamburger.classList.add('open');
+  }
+});
+document.querySelectorAll('.mobile-link, .mobile-cta').forEach(link => {
+  link.addEventListener('click', () => {
+    mobileMenu.style.opacity = '0';
+    hamburger.classList.remove('open');
+    setTimeout(() => { mobileMenu.style.display = 'none'; }, 350);
+  });
+});
+</script>
+</body>
+</html>
