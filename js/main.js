@@ -8,25 +8,17 @@ const counter = document.getElementById('counter');
 const progress = document.getElementById('progress');
 let current = 0, timer, progTimer;
 
-/* ---FUNCIÓN para CAROUSEL --- */
-
-/* --- REEMPLAZA SOLO ESTA FUNCIÓN EN TU JS --- */
 function goTo(idx) {
     if (!track) return;
     
-    // Limpiar estados activos
     slides[current].classList.remove('active');
     dots[current].classList.remove('active');
     
-    // Calcular nuevo índice (infinito)
     current = (idx + slides.length) % slides.length;
     
-    // Activar nuevo slide
     slides[current].classList.add('active');
     dots[current].classList.add('active');
     
-    // MOVIMIENTO QUIRÚRGICO: 
-    // Usamos 'vw' para mover exactamente un ancho de pantalla real por slide.
     track.style.transform = `translateX(-${current * 100}vw)`;
     
     if (counter) {
@@ -52,20 +44,118 @@ function startAuto() {
     timer = setInterval(() => goTo(current + 1), 5000);
 }
 
-/* EVENT LISTENERS */
+/* EVENT LISTENERS DEL CARRUSEL */
 document.getElementById('nextBtn')?.addEventListener('click', () => { goTo(current + 1); startAuto(); });
 document.getElementById('prevBtn')?.addEventListener('click', () => { goTo(current - 1); startAuto(); });
 dots.forEach((dot, index) => {
     dot.addEventListener('click', () => { goTo(index); startAuto(); });
 });
 
-/* INICIALIZACIÓN */
+
+/* ==========================================================================
+   INTEGRACIÓN DINÁMICA CON GOOGLE SHEETS & PARSEADOR ROBUSTO
+   ========================================================================== */
+// Cuando tengas el enlace de Google Sheets, lo pegas aquí. Mientras esté vacío, usará el simulador local.
+const URL_PROPIEDADES_CSV = ""; 
+
+// DATOS DE PRUEBA LOCALES (Simulan exactamente el comportamiento del Excel)
+const CSV_DE_PRUEBA = `id,tipo,operacion,nombre,ubicacion,etiqueta,imagen,link_wa
+1,casa,venta,Casa Campestre Sol del Llano,"Puerto López, Meta",Oportunidad Única,img/propiedades/Propiedad 2_1.jpeg,Hola KC Bienes Raíces me interesa la Casa Campestre
+2,lote,venta,Lote de Alta Valorización,"Villavicencio, Meta",Inversión Premium,img/propiedades/lote_venta.webp,Hola KC Bienes Raíces me interesa el Lote de Terreno`;
+
+async function cargarInventarioDesdeSheets() {
+    try {
+        // CONTROL DE CONTINGENCIA: Si no hay URL configurada, procesa el Mock local de inmediato
+        if (!URL_PROPIEDADES_CSV || URL_PROPIEDADES_CSV === "TU_URL_DE_GOOGLE_SHEETS_AQUÍ") {
+            console.log("⚠️ Modo Desarrollo: Cargando inventario desde Mock local...");
+            const propiedades = parsearCSV(CSV_DE_PRUEBA);
+            renderizarTarjetas(propiedades);
+            return;
+        }
+
+        // Flujo de producción cuando configures la URL real
+        const respuesta = await fetch(URL_PROPIEDADES_CSV);
+        if (!respuesta.ok) throw new Error("No se pudo conectar con la fuente de datos");
+        
+        const dataCSV = await respuesta.text();
+        const propiedades = parsearCSV(dataCSV);
+        renderizarTarjetas(propiedades);
+    } catch (error) {
+        console.error("Error cargando los datos desde Google Sheets:", error);
+    }
+}
+
+/* EL PARSEADOR ROBUSTO CON REGEX (Senior-grade) */
+function parsearCSV(texto) {
+    const lineas = texto.split("\n").map(l => l.trim()).filter(l => l.length > 0);
+    if (lineas.length === 0) return [];
+
+    const encabezados = lineas[0].split(",").map(h => h.trim().replace(/^["']|["']$/g, ""));
+    const resultado = [];
+
+    for (let i = 1; i < lineas.length; i++) {
+        const linea = lineas[i];
+        const campos = [];
+        let coincidencia;
+        const regex = /"([^"]*)"|([^,]+)/g;
+        
+        while ((coincidencia = regex.exec(linea)) !== null) {
+            campos.push((coincidencia[1] !== undefined ? coincidencia[1] : coincidencia[2]).trim());
+        }
+
+        if (campos.length < encabezados.length) continue;
+
+        const objeto = {};
+        encabezados.forEach((encabezado, index) => {
+            objeto[encabezado] = campos[index] || "";
+        });
+        
+        resultado.push(objeto);
+    }
+    return resultado;
+}
+
+/* RENDERIZADOR DINÁMICO DE TARJETAS */
+function renderizarTarjetas(listaPropiedades) {
+    const contenedorGrid = document.querySelector(".properties-grid");
+    if (!contenedorGrid) return;
+
+    contenedorGrid.innerHTML = ""; // Limpiamos el HTML estático de prueba
+
+    listaPropiedades.forEach(prop => {
+        const tarjetaHTML = `
+            <div class="prop-card ${prop.tipo} ${prop.operacion}"> 
+                <img src="${prop.imagen}" alt="${prop.nombre}" class="prop-card-img" loading="lazy">
+                <div class="prop-info">
+                    <span class="prop-tag">${prop.etiqueta}</span>
+                    <h3 class="prop-name">${prop.nombre}</h3>
+                    <p class="prop-location">${prop.ubicacion}</p>
+                    <a href="https://wa.me/573138341671?text=${encodeURIComponent(prop.link_wa)}" target="_blank" class="btn-primary" style="display: inline-block; margin-top: 10px; text-decoration: none;">Ver Detalles</a>
+                </div>
+            </div>
+        `;
+        contenedorGrid.insertAdjacentHTML("beforeend", tarjetaHTML);
+    });
+    console.log(`¡Éxito! Se renderizaron ${listaPropiedades.length} propiedades desde la nube.`);
+}
+
+
+/* ==========================================================================
+   INICIALIZACIÓN GLOBAL (DOM Content Loaded)
+   ========================================================================== */
 document.addEventListener('DOMContentLoaded', () => {
+    // Inicializar carrusel si aplica
     if (track) {
         goTo(0);
         startAuto();
     }
+    
+    // Inicializar carga dinámica de propiedades desde Google Sheets
+    if (document.querySelector(".properties-grid")) {
+        cargarInventarioDesdeSheets();
+    }
 });
+
 
 /* MENÚ HAMBURGUESA Y MÓVIL */
 const hamburger = document.getElementById('hamburger');
@@ -94,54 +184,52 @@ if (hamburger && mobileMenu) {
     });
 }
 
-/* Funcion de busqueda */
 
+/*SISTEMA DE BÚSQUEDA Y FILTRADO (REACTIVO Y COMPATIBLE) */
 function ejecutarBusqueda() {
-    // 1. Capturamos los valores
     const tipo = document.getElementById('search-tipo').value;
     const operacion = document.getElementById('search-operacion').value;
     const textoInput = document.getElementById('search-text').value.toLowerCase();
     
     console.log("--- INICIANDO FILTRADO ---");
-    console.log("Buscando:", tipo, operacion, textoInput);
 
-    // 2. Seleccionamos las tarjetas
     const tarjetas = document.querySelectorAll('.prop-card');
+    let encontrados = 0;
 
     tarjetas.forEach((tarjeta) => {
         const contenidoVisible = tarjeta.innerText.toLowerCase();
         
-        // 3. Lógica de comparación
         const coincideTipo = (tipo === "todos" || tarjeta.classList.contains(tipo));
         const coincideOperacion = (operacion === "todos" || tarjeta.classList.contains(operacion));
         const coincideTexto = (textoInput === "" || contenidoVisible.includes(textoInput));
 
-        // 4. Aplicar visibilidad con !important para ganarle al CSS
         if (coincideTipo && coincideOperacion && coincideTexto) {
             tarjeta.style.setProperty('display', 'block', 'important');
             tarjeta.style.opacity = "1";
+            encontrados++;
         } else {
             tarjeta.style.setProperty('display', 'none', 'important');
             tarjeta.style.opacity = "0";
         }
     });
     
+    // Control de mensaje de "No resultados"
+    const mensajeNoResultados = document.getElementById('no-results');
+    if (mensajeNoResultados) {
+        mensajeNoResultados.style.display = (encontrados === 0) ? "block" : "none";
+    }
     console.log("--- FILTRADO FINALIZADO ---");
 }
 
-/* FUNCIÓN: LIMPIAR FILTROS */
 function limpiarFiltros() {
-    // 1. Restablecemos los valores de los inputs/selects del HTML
     if (document.getElementById('search-text')) document.getElementById('search-text').value = "";
     if (document.getElementById('search-tipo')) document.getElementById('search-tipo').value = "todos";
     if (document.getElementById('search-operacion')) document.getElementById('search-operacion').value = "todos";
     if (document.getElementById('search-precio')) document.getElementById('search-precio').value = "todos";
 
-    // 2. Ocultamos el mensaje de "no resultados" por si estaba activo
     const mensajeNoResultados = document.getElementById('no-results');
     if (mensajeNoResultados) mensajeNoResultados.style.display = "none";
 
-    // 3. Volvemos a mostrar TODAS las tarjetas de propiedades
     const tarjetas = document.querySelectorAll('.prop-card');
     tarjetas.forEach(tarjeta => {
         tarjeta.style.setProperty('display', 'block', 'important');
@@ -153,24 +241,15 @@ function limpiarFiltros() {
 
 function toggleMenu() {
     const menu = document.getElementById('mobileMenu');
-    
-    // Si manejas la visibilidad con una clase CSS (Recomendado para transiciones suaves)
     if (menu.classList.contains('active')) {
         menu.classList.remove('active');
     } else {
         menu.classList.add('active');
     }
-    /* O si lo manejas directo con display, descomenta esto:
-    if (menu.style.display === "flex") {
-        menu.style.display = "none";
-    } else {
-        menu.style.display = "flex";
-    }
-    */
 }
 
-/*Funcion Menu asesores Whatsapp*/ 
 
+/* MENÚ ASESORES WHATSAPP */
 function toggleWhatsAppMenu() {
     const waMenu = document.getElementById('waMenu');
     if (waMenu) {
@@ -178,7 +257,6 @@ function toggleWhatsAppMenu() {
     }
 }
 
-// Cierre opcional: Si hacen clic fuera del menú, este se cierra solo
 document.addEventListener('click', function(event) {
     const container = document.querySelector('.whatsapp-container');
     const waMenu = document.getElementById('waMenu');
