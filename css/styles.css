@@ -515,14 +515,121 @@
     .services-grid { grid-template-columns: 1fr; }
     .service-card { padding: 2rem 1.5rem; }
 
-    /* Properties */
-    .properties-header { flex-direction: column; align-items: flex-start; gap: 1.5rem; margin-bottom: 2rem; }
-    .properties-grid { grid-template-columns: 1fr; gap: 2px; }
-    .prop-card-img { min-height: 260px; }
-    .prop-main .prop-card-img { min-height: 300px; }
-    .prop-main .prop-name { font-size: 1.5rem; }
-    .prop-info { padding: 1.2rem; }
-    .prop-details { flex-wrap: wrap; gap: 0.6rem; }
+/* PROPERTIES (Refinamiento Estético Premium para Móvil) */
+  .properties-header { 
+    flex-direction: column; 
+    align-items: flex-start; 
+    gap: 1rem; 
+    margin-bottom: 2.5rem; 
+  }
+  
+  /* Contenedor principal con márgenes laterales para que no toque los bordes de la pantalla */
+  .properties-grid { 
+    display: flex !important; 
+    flex-direction: column !important; 
+    gap: 35px !important; 
+    background: none !important; 
+    width: 100% !important;
+    padding: 0 10px; /* Le da aire al catálogo respecto a los bordes del celular */
+  }
+  
+  .prop-card { 
+    display: flex !important; 
+    flex-direction: column !important; 
+    position: relative !important; 
+    width: 100% !important; 
+    background: var(--navy-mid); 
+    border-radius: 4px; /* Bordes más rectos y sutiles para alinearse al look de lujo */
+    overflow: hidden;
+    border: 1px solid rgba(200, 169, 110, 0.15); /* Fina línea dorada alrededor de la tarjeta */
+    box-shadow: 0 10px 30px rgba(7, 14, 26, 0.25); /* Sombra suave y profunda */
+  }
+  
+  /* Contenedor multimedia elegante */
+  .img-container {
+    position: relative !important;
+    width: 100% !important;
+    height: 240px !important; 
+    overflow: hidden;
+  }
+
+  .prop-card-img { 
+    width: 100% !important;
+    height: 100% !important; 
+    object-fit: cover !important; 
+    filter: brightness(0.85); /* Un toque más de luz para apreciar el inmueble */
+  }
+  
+  .prop-main .prop-card-img { min-height: 240px !important; }
+  
+  /* Ajuste tipográfico fino */
+  .prop-name {
+    font-family: 'Cormorant Garamond', serif !important; /* Mantenemos tu fuente de lujo */
+    font-size: 1.75rem !important; /* Tamaño jerárquico perfecto para móvil */
+    font-weight: 400 !important;
+    line-height: 1.2 !important;
+    margin-top: 0.5rem !important;
+    margin-bottom: 0.3rem !important;
+    color: var(--white) !important;
+  }
+  .prop-main .prop-name { font-size: 1.75rem !important; }
+  
+  .prop-location {
+    font-size: 0.8rem !important;
+    color: rgba(255, 255, 255, 0.5) !important;
+    letter-spacing: 0.05em;
+    margin-bottom: 1.2rem !important;
+  }
+  
+  /* Bloque de contenido interno con distribución simétrica */
+  .prop-info { 
+    position: relative !important; 
+    inset: auto !important; 
+    padding: 2rem 1.8rem !important; /* Más espacio interno para que se vea costoso */
+    background: var(--navy-mid) !important; 
+    transform: translateY(0) !important; 
+    width: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-start !important; /* Alinea todo limpiamente a la izquierda */
+  }
+  
+  .prop-details { 
+    flex-wrap: wrap; 
+    gap: 1rem; 
+    font-size: 0.8rem !important;
+    color: rgba(255, 255, 255, 0.65);
+    margin-bottom: 1rem;
+  }
+
+  /* Ajuste al botón "Ver Detalles" para que sea consistente con tus botones premium */
+  .prop-info .btn-primary {
+    width: 100%; /* El botón ocupa todo el ancho en móvil, es más cómodo para el pulgar */
+    text-align: center;
+    padding: 1rem 2rem;
+    font-size: 0.72rem;
+    letter-spacing: 0.15em;
+    border-radius: 2px;
+  }
+
+  /* Rediseño estilizado de la etiqueta de la cámara */
+  .photo-counter-tag {
+    position: absolute !important;
+    top: 15px !important;
+    right: 15px !important;
+    bottom: auto !important;
+    left: auto !important;
+    background: rgba(11, 22, 40, 0.85) !important;
+    color: var(--gold) !important;
+    border: 1px solid var(--gold) !important;
+    padding: 6px 14px !important;
+    font-size: 0.65rem !important;
+    font-family: 'Jost', sans-serif !important;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    border-radius: 2px !important;
+    z-index: 20 !important;
+  }
 
     /* About */
     .about { display: flex; flex-direction: column; }
@@ -932,4 +1039,97 @@
 .mobile-menu {
   position: fixed; /* O absolute, según como lo tengas */
   /* Tu estilo existente (top, left, width, height, etc.) debe mantenerse */
+}
+
+/* --- MODAL DE GALERÍA (LIGHTBOX) --- */
+.gallery-modal {
+    display: none; /* Oculto por defecto hasta que se haga clic */
+    position: fixed;
+    z-index: 3500; /* Asegura estar por encima del menú y botones flotantes */
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.92);
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-content {
+    position: relative;
+    width: 90%;
+    max-width: 850px;
+    height: 65vh;
+    overflow: hidden;
+    border-radius: 8px;
+    box-shadow: 0 5px 30px rgba(0,0,0,0.5);
+}
+
+.modal-slider-track {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.modal-slide-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Recorte limpio inteligente */
+    flex-shrink: 0;
+}
+
+/* Navegación interna del Modal */
+.modal-nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(12, 28, 48, 0.85); /* Tu azul navy de marca */
+    color: #e5c158; /* Tu dorado de marca */
+    border: none;
+    font-size: 26px;
+    padding: 10px 16px;
+    cursor: pointer;
+    border-radius: 50%;
+    transition: all 0.2s ease;
+    user-select: none;
+}
+
+.modal-nav:hover {
+    background: #e5c158;
+    color: #0c1c30;
+}
+
+.modal-nav.prev { left: 20px; }
+.modal-nav.next { right: 20px; }
+
+.close-modal {
+    position: absolute;
+    top: 20px;
+    right: 35px;
+    color: #fff;
+    font-size: 45px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: color 0.2s;
+    user-select: none;
+}
+.close-modal:hover { color: #e5c158; }
+
+/* Indicador visual de fotos sobre la tarjeta */
+.img-container {
+    position: relative;
+    overflow: hidden;
+}
+.photo-counter-tag {
+    position: absolute;
+    bottom: 15px;
+    right: 15px;
+    background: rgba(12, 28, 48, 0.85);
+    color: #fff;
+    padding: 5px 10px;
+    font-size: 12px;
+    border-radius: 4px;
+    font-family: sans-serif;
+    pointer-events: none;
 }

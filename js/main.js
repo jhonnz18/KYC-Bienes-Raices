@@ -115,17 +115,27 @@ function parsearCSV(texto) {
     return resultado;
 }
 
-/* RENDERIZADOR DINÁMICO DE TARJETAS */
 function renderizarTarjetas(listaPropiedades) {
     const contenedorGrid = document.querySelector(".properties-grid");
     if (!contenedorGrid) return;
 
-    contenedorGrid.innerHTML = ""; // Limpiamos el HTML estático de prueba
+    contenedorGrid.innerHTML = ""; 
 
     listaPropiedades.forEach(prop => {
+        // Separamos las rutas de las imágenes usando el pipe '|'.
+        // Si no hay pipe (como en tu mock actual), fotosArray tendrá un solo elemento.
+        const fotosArray = prop.imagen.split("|").map(url => url.trim());
+        const fotoPortada = fotosArray[0]; // La primera es la portada exterior
+        
+        // Unificamos el arreglo en un string plano separado por comas para pasarlo al Modal
+        const todasLasFotosString = fotosArray.join(",");
+
         const tarjetaHTML = `
             <div class="prop-card ${prop.tipo} ${prop.operacion}"> 
-                <img src="${prop.imagen}" alt="${prop.nombre}" class="prop-card-img" loading="lazy">
+                <div class="img-container" style="cursor: pointer;" onclick="abrirGaleria('${todasLasFotosString}')">
+                    <img src="${fotoPortada}" alt="${prop.nombre}" class="prop-card-img" loading="lazy">
+                    <span class="photo-counter-tag">📷 Ver fotos (${fotosArray.length})</span>
+                </div>
                 <div class="prop-info">
                     <span class="prop-tag">${prop.etiqueta}</span>
                     <h3 class="prop-name">${prop.nombre}</h3>
@@ -136,9 +146,8 @@ function renderizarTarjetas(listaPropiedades) {
         `;
         contenedorGrid.insertAdjacentHTML("beforeend", tarjetaHTML);
     });
-    console.log(`¡Éxito! Se renderizaron ${listaPropiedades.length} propiedades desde la nube.`);
+    console.log(`¡Éxito! Se renderizaron ${listaPropiedades.length} propiedades con soporte multimedia.`);
 }
-
 
 /* ==========================================================================
    INICIALIZACIÓN GLOBAL (DOM Content Loaded)
@@ -265,5 +274,73 @@ document.addEventListener('click', function(event) {
         if (waMenu && waMenu.classList.contains('active')) {
             waMenu.classList.remove('active');
         }
+    }
+});
+
+/* ==========================================================================
+   SISTEMA DE GALERÍA FLOTANTE (LIGHTBOX MULTIMEDIA)
+   ========================================================================== */
+let fotosModalActuales = [];
+let indiceFotoModal = 0;
+
+function abrirGaleria(fotosString) {
+    const modal = document.getElementById("galleryModal");
+    const trackModal = document.getElementById("modalSliderTrack");
+    const btnPrev = document.getElementById("modalPrev");
+    const btnNext = document.getElementById("modalNext");
+    
+    if (!modal || !trackModal) return;
+
+    // Convertimos el string de nuevo a un Array de rutas
+    fotosModalActuales = fotosString.split(",");
+    indiceFotoModal = 0;
+    
+    // Inyectamos dinámicamente las imágenes al carrusel flotante
+    trackModal.innerHTML = fotosModalActuales.map(url => `
+        <img src="${url}" class="modal-slide-img" alt="Vista de la propiedad">
+    `).join("");
+    
+    // Mostramos u ocultamos las flechas según la cantidad de fotos
+    if (fotosModalActuales.length <= 1) {
+        if (btnPrev) btnPrev.style.display = "none";
+        if (btnNext) btnNext.style.display = "none";
+    } else {
+        if (btnPrev) btnPrev.style.display = "block";
+        if (btnNext) btnNext.style.display = "block";
+    }
+    
+    modal.style.display = "flex";
+    actualizarPosicionModal();
+}
+
+function cambiarFotoModal(direccion) {
+    if (fotosModalActuales.length <= 1) return;
+    indiceFotoModal = (indiceFotoModal + direccion + fotosModalActuales.length) % fotosModalActuales.length;
+    actualizarPosicionModal();
+}
+
+function actualizarPosicionModal() {
+    const trackModal = document.getElementById("modalSliderTrack");
+    if (trackModal) {
+        // Usamos '%' para el desplazamiento ya que 'vw' traería problemas en el modal
+        trackModal.style.transform = `translateX(-${indiceFotoModal * 100}%)`;
+    }
+}
+
+function cerrarGaleria() {
+    const modal = document.getElementById("galleryModal");
+    if (modal) modal.style.display = "none";
+}
+
+// Cerrar si hacen clic fuera de la imagen (en el fondo oscuro)
+window.addEventListener("click", (e) => {
+    const modal = document.getElementById("galleryModal");
+    if (e.target === modal) cerrarGaleria();
+});
+
+// Cerrar con la tecla Esc
+document.addEventListener('keydown', function(event) {
+    if (event.key === "Escape") {
+        cerrarGaleria();
     }
 });

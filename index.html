@@ -249,7 +249,7 @@
 <!-- Nosotros -->
 <section class="about" id="nosotros">
   <div class="about-image">
-    <img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?w=800&q=85" alt="">
+    <img src="img/About.webp" alt="about">
     <div class="about-image-label">Nuestro Equipo</div>
   </div>
   <div class="about-content">
@@ -396,6 +396,15 @@ La compañía se enfoca en ofrecer soluciones inmobiliarias eficientes, apoyánd
     <button class="whatsapp-btn-trigger" onclick="toggleWhatsAppMenu()" aria-label="Abrir chat de WhatsApp">
         <i class="fab fa-whatsapp"></i>
     </button>
+</div>
+<div id="galleryModal" class="gallery-modal">
+    <span class="close-modal" onclick="cerrarGaleria()">&times;</span>
+    <div class="modal-content">
+        <div id="modalSliderTrack" class="modal-slider-track"></div>
+        
+        <button class="modal-nav prev" onclick="cambiarFotoModal(-1)">&#10094;</button>
+        <button class="modal-nav next" onclick="cambiarFotoModal(1)">&#10095;</button>
+    </div>
 </div>
 </body>
 <script src="js/main.js"></script>
