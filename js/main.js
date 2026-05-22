@@ -60,8 +60,8 @@ const URL_PROPIEDADES_CSV = "";
 
 // DATOS DE PRUEBA LOCALES (Simulan exactamente el comportamiento del Excel)
 const CSV_DE_PRUEBA = `id,tipo,operacion,nombre,ubicacion,etiqueta,imagen,link_wa,precio,metros,habitaciones,banos
-1,casa,venta,Casa Campestre Sol del Llano,"Puerto López, Meta",Oportunidad Única,img/propiedades/Propiedad 2_1.jpeg,Hola KC Bienes Raíces me interesa la Casa Campestre,$ 350.000.000,150 m²,3,2
-2,lote,venta,Lote de Alta Valorización,"Villavicencio, Meta",Inversión Premium,img/propiedades/lote_venta.webp,Hola KC Bienes Raíces me interesa el Lote de Terreno,$ 180.000.000,1000 m²,0,0`;
+1,casa,venta,Casa Campestre Sol del Llano,"Puerto López, Meta",Oportunidad Única,img/propiedades/Propiedad 2_1.jpeg | img/propiedades/Propiedad 2_2.jpeg | img/propiedades/Propiedad 2_3.jpeg,Hola KC Bienes Raíces me interesa la Casa Campestre,$ 350.000.000,150 m²,3,2
+2,lote,venta,Lote de Alta Valorización,"Villavicencio, Meta",Inversión Premium,img/propiedades/lote_venta.webp | img/propiedades/Propiedad 2_1.jpeg,Hola KC Bienes Raíces me interesa el Lote de Terreno,$ 180.000.000,1000 m²,0,0`;
 
 async function cargarInventarioDesdeSheets() {
     try {
