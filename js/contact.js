@@ -56,37 +56,3 @@ if (contactForm) {
             });
     });
 }
-
-/* Funcion de busqueda */
-
-function ejecutarBusqueda() {
-    const tipo = document.getElementById('search-tipo').value;
-    const operacion = document.getElementById('search-operacion').value;
-    const texto = document.getElementById('search-text').value.toLowerCase();
-    
-    console.log(`FILTRO ACTIVO -> Tipo: ${tipo}, Op: ${operacion}`);
-
-    const tarjetas = document.querySelectorAll('.prop-card');
-    
-    if(tarjetas.length === 0) {
-        console.error("¡ERROR: No encontré ninguna tarjeta con la clase .prop-card!");
-        return;
-    }
-
-    tarjetas.forEach((tarjeta, index) => {
-        // Esto nos dirá qué clases tiene la tarjeta en la realidad
-        console.log(`Tarjeta #${index} clases:`, tarjeta.className);
-
-        const coincideTipo = (tipo === "todos" || tarjeta.classList.contains(tipo));
-        const coincideOperacion = (operacion === "todos" || tarjeta.classList.contains(operacion));
-        const coincideTexto = (texto === "" || tarjeta.innerText.toLowerCase().includes(texto));
-
-        if (coincideTipo && coincideOperacion && coincideTexto) {
-            tarjeta.style.setProperty("display", "block", "important");
-            tarjeta.style.opacity = "1";
-        } else {
-            tarjeta.style.setProperty("display", "none", "important");
-            tarjeta.style.opacity = "0";
-        }
-    });
-}
