@@ -59,9 +59,9 @@ dots.forEach((dot, index) => {
 const URL_PROPIEDADES_CSV = ""; 
 
 // DATOS DE PRUEBA LOCALES (Simulan exactamente el comportamiento del Excel)
-const CSV_DE_PRUEBA = `id,tipo,operacion,nombre,ubicacion,etiqueta,imagen,link_wa
-1,casa,venta,Casa Campestre Sol del Llano,"Puerto López, Meta",Oportunidad Única,img/propiedades/Propiedad 2_1.jpeg,Hola KC Bienes Raíces me interesa la Casa Campestre
-2,lote,venta,Lote de Alta Valorización,"Villavicencio, Meta",Inversión Premium,img/propiedades/lote_venta.webp,Hola KC Bienes Raíces me interesa el Lote de Terreno`;
+const CSV_DE_PRUEBA = `id,tipo,operacion,nombre,ubicacion,etiqueta,imagen,link_wa,precio,metros,habitaciones,banos
+1,casa,venta,Casa Campestre Sol del Llano,"Puerto López, Meta",Oportunidad Única,img/propiedades/Propiedad 2_1.jpeg,Hola KC Bienes Raíces me interesa la Casa Campestre,$ 350.000.000,150 m²,3,2
+2,lote,venta,Lote de Alta Valorización,"Villavicencio, Meta",Inversión Premium,img/propiedades/lote_venta.webp,Hola KC Bienes Raíces me interesa el Lote de Terreno,$ 180.000.000,1000 m²,0,0`;
 
 async function cargarInventarioDesdeSheets() {
     try {
@@ -122,12 +122,8 @@ function renderizarTarjetas(listaPropiedades) {
     contenedorGrid.innerHTML = ""; 
 
     listaPropiedades.forEach(prop => {
-        // Separamos las rutas de las imágenes usando el pipe '|'.
-        // Si no hay pipe (como en tu mock actual), fotosArray tendrá un solo elemento.
         const fotosArray = prop.imagen.split("|").map(url => url.trim());
-        const fotoPortada = fotosArray[0]; // La primera es la portada exterior
-        
-        // Unificamos el arreglo en un string plano separado por comas para pasarlo al Modal
+        const fotoPortada = fotosArray[0]; 
         const todasLasFotosString = fotosArray.join(",");
 
         const tarjetaHTML = `
@@ -140,13 +136,21 @@ function renderizarTarjetas(listaPropiedades) {
                     <span class="prop-tag">${prop.etiqueta}</span>
                     <h3 class="prop-name">${prop.nombre}</h3>
                     <p class="prop-location">${prop.ubicacion}</p>
+                    
+                    <div class="prop-details">
+                        <span>${prop.metros || 'N/A'}</span>
+                        ${prop.habitaciones && prop.habitaciones !== '0' ? `<span>${prop.habitaciones} Hab</span>` : ''}
+                        ${prop.banos && prop.banos !== '0' ? `<span>${prop.banos} Baños</span>` : ''}
+                    </div>
+                    
+                    <div class="prop-price">${prop.precio}</div>
+                    
                     <a href="https://wa.me/573138341671?text=${encodeURIComponent(prop.link_wa)}" target="_blank" class="btn-primary" style="display: inline-block; margin-top: 10px; text-decoration: none;">Ver Detalles</a>
                 </div>
             </div>
         `;
         contenedorGrid.insertAdjacentHTML("beforeend", tarjetaHTML);
     });
-    console.log(`¡Éxito! Se renderizaron ${listaPropiedades.length} propiedades con soporte multimedia.`);
 }
 
 /* ==========================================================================
